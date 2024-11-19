@@ -6,9 +6,8 @@ process GCTA_GSMR {
               'quay.io/biocontainers/gcta:1.94.1--h9ee0642_0' }"
 
     input: 
-    path(exposure)
+    tuple val(meta), path(exposure), val(meta2), path(outcome)
     path(reference)
-    path(outcome)
 
     output:
     path "${exposure.getBaseName(2)}_${outcome.baseName}.log", emit: gsmr_log
@@ -17,6 +16,8 @@ process GCTA_GSMR {
 
     script:
     """
+    ulimit -c 0
+
     if [[ $exposure == *.gz ]]; then
         gunzip "$exposure"
     fi
@@ -35,7 +36,6 @@ process GCTA_GSMR {
     --clump-r2 0.05   \
     --heidi-thresh 0.01   \
     --effect-plot   \
-    --gsmr2-beta \
     --out "${exposure.getBaseName(2)}_${outcome.baseName}"
     """
 }
